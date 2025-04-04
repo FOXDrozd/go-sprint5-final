@@ -1,6 +1,8 @@
 package spentenergy
 
-import ...
+import (
+	"time"
+)
 
 // Основные константы, необходимые для расчетов.
 const (
@@ -28,8 +30,20 @@ const (
 // duration time.Duration — длительность тренировки.
 //
 // Создайте функцию ниже.
-...
+func WalkingSpentCaloriess(steps int, weight, height float64, duration time.Duration) float64 {
+	if checkLessZero(weight) && checkLessZero(height) {
+		return 0
+	}
 
+	if checkLessZero(float64(duration)) {
+		return 0
+	}
+
+	meanSpeed := MeanSpeed(steps, duration)
+
+	calories := ((walkingCaloriesWeightMultiplier * weight) + (meanSpeed*meanSpeed/height)*walkingSpeedHeightMultiplier) * duration.Hours() * minInH
+	return calories
+}
 
 // Константы для расчета калорий, расходуемых при беге.
 const (
@@ -46,7 +60,20 @@ const (
 // duration time.Duration — длительность тренировки.
 //
 // Создайте функцию ниже.
-...
+func RunningSpentCalories(steps int, weight float64, duration time.Duration) float64 {
+	if checkLessZero(weight) {
+		return 0
+	} 
+
+	if checkLessZero(float64(duration)) {
+		return 0
+	}
+
+	meanSpeed := MeanSpeed(steps, duration)
+
+	calories:= ((runningCaloriesMeanSpeedMultiplier*meanSpeed)-runningCaloriesMeanSpeedShift) * weight
+	return calories
+}
 
 
 // МeanSpeed возвращает значение средней скорости движения во время тренировки.
@@ -57,7 +84,16 @@ const (
 // duration time.Duration — длительность тренировки.
 // 
 // Создайте функцию ниже.
-...
+func MeanSpeed(steps int, duration time.Duration) float64 {
+	//Проверить, что продолжительность duration больше 0. Если это не так — вернуть 0.
+	if checkLessZero(float64(duration)) {
+		return 0
+	}
+
+	distanceUser := Distance(steps)
+
+	return distanceUser / duration.Hours()
+}
 
 
 // Distance возвращает дистанцию(в километрах), которую преодолел пользователь за время тренировки.
@@ -68,6 +104,20 @@ const (
 // steps int — количество совершенных действий (число шагов при ходьбе и беге).
 // 
 // Создайте функцию ниже
-...
+func Distance(steps int) float64 {
+	if(steps == 0){
+		return 0
+	}
+
+	return (float64(steps) * lenStep) / mInKm
+}
 
 
+//Фугкция проверки на больше 0 
+func checkLessZero(num float64) bool {
+	if(num <= 0){
+		return true
+	}
+
+	return false
+}
